@@ -70,25 +70,25 @@ df.loc[(df["day_diff"] > 280) & (df["day_diff"] < 600)].count()
 df["reviewTime"] = pd.to_datetime(df["reviewTime"])
 
 def time_based_weighted_average(dataframe, w1=28, w2=26, w3=24, w4=22):
-    return dataframe.loc[df["day_diff"] <= 100, "overall"].mean() * w1/100 + \
-           dataframe.loc[df["day_diff"] > 280 & (df["day_diff"] <= 430), "overall"].mean() * w2/100 + \
-           dataframe.loc[df["day_diff"] > 430 & (df["day_diff"] <= 600), "overall"].mean() * w3/100 + \
-           dataframe.loc[df["day_diff"] > 600, "overall"].mean() * w4/100
+    return dataframe.loc[dataframe["day_diff"] <= dataframe["day_diff"].quantile(0.25), "overall"].mean() * w1/100 + \
+           dataframe.loc[(dataframe["day_diff"] > dataframe["day_diff"].quantile(0.25)) & (dataframe["day_diff"] <= dataframe["day_diff"].quantile(0.55)), "overall"].mean() * w2/100 + \
+           dataframe.loc[(dataframe["day_diff"] > dataframe["day_diff"].quantile(0.50)) & (dataframe["day_diff"] <= dataframe["day_diff"].quantile(0.75)), "overall"].mean() * w3/100 + \
+           dataframe.loc[dataframe["day_diff"] > dataframe["day_diff"].quantile(0.75), "overall"].mean() * w4/100
 
 
-time_based_weighted_average(df)  # 4.601822416778495
+time_based_weighted_average(df)  # 4.593847825464406
 
-# Average Rating in the last 100 days:
-df.loc[df["day_diff"] <= 100, "overall"].mean()
+# Average Rating in the 0.25 quartile:
+df.loc[df["day_diff"] <= df["day_diff"].quantile(0.25), "overall"].mean()
 
-# Average Rating in between last 200 and 430 days:
-df.loc[(df["day_diff"] > 280) & (df["day_diff"] <= 430), "overall"].mean()
+# Average Rating in between 0.25 and 0.50 quartiles:
+df.loc[(df["day_diff"] > df["day_diff"].quantile(0.25)) & (df["day_diff"] <= df["day_diff"].quantile(0.55)), "overall"].mean()
 
-# Average Rating in between last 430 and 600 days:
-df.loc[(df["day_diff"] > 430) & (df["day_diff"] <= 600), "overall"].mean()
+# Average Rating in between 0.50 and 0.75 quartiles:
+df.loc[(df["day_diff"] > df["day_diff"].quantile(0.50)) & (df["day_diff"] <= df["day_diff"].quantile(0.75)), "overall"].mean()
 
-# Average Rating 600 days older:
-df.loc[(df["day_diff"] > 600), "overall"].mean()
+# Average Rating > 0.75 quartile:
+df.loc[df["day_diff"] > df["day_diff"].quantile(0.75), "overall"].mean()
 
 #######################################################
 # 3- Specifying 20 reviews for the product to be displayed on the product detail page
