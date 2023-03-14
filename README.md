@@ -39,13 +39,43 @@ amazon_review.csv is a dataset that contains Amazon product data, includes produ
 - **total_vote**: Total Review Vote
 ---
 ### **Goal of the Project**
+This study aims to calculate Average Rating with current reviews and specify 20 reviews for the product to be displayed on the product detail page.
 
+1-) According to calculations;
 
-<p align="left">
-  <img src="" />
+```ruby
+df["overall"].mean()  # 4.587589013224822
+
+time_based_weighted_average(df)  # 4.593847825464406
+```
+There is a minimal difference between **normal mean** and **time-based weighted mean**.
+
+2-) **time_based_weighted_average()** function is;
+```ruby
+def time_based_weighted_average(dataframe, w1=28, w2=26, w3=24, w4=22):
+    return dataframe.loc[dataframe["day_diff"] <= dataframe["day_diff"].quantile(0.25), "overall"].mean() * w1/100 + \
+           dataframe.loc[(dataframe["day_diff"] > dataframe["day_diff"].quantile(0.25)) & (dataframe["day_diff"] <= dataframe["day_diff"].quantile(0.55)), "overall"].mean() * w2/100 + \
+           dataframe.loc[(dataframe["day_diff"] > dataframe["day_diff"].quantile(0.50)) & (dataframe["day_diff"] <= dataframe["day_diff"].quantile(0.75)), "overall"].mean() * w3/100 + \
+           dataframe.loc[dataframe["day_diff"] > dataframe["day_diff"].quantile(0.75), "overall"].mean() * w4/100
+```
+In this part, the score of current users was held more important. Scores can be adjustable according to analysis comments.
+
+3-) Last part, there is a comparison some methods about to examine reviews. Wilson Lower Bound (WLB) is more useful to specify 20 reviews for the product.
+```ruby
+df["score_pos_neg_diff"] = df.apply(lambda x: score_up_down_diff(x["helpful_yes"],
+                                                                 x["helpful_no"]), axis=1)
+
+df["score_average_rating"] = df.apply(lambda x: score_average_rating(x["helpful_yes"],
+                                                                     x["helpful_no"]), axis=1)
+
+df["wilson_lower_bound"] = df.apply(lambda x: wilson_lower_bound(x["helpful_yes"],
+                                                                 x["helpful_no"]), axis=1)
+```
+---
+**Conclusion:** As a result of the study, the table sorted according to the wilson lower bound variable can be seen below.
+
+<p align="middle">
+  <img src="https://user-images.githubusercontent.com/95078183/225131083-519a87be-93d1-4f4b-9913-b40d1072c48b.png" />
 </p>
 
-<p align="right">
-  <img src="" Target Output />
-</p>
 
