@@ -48,7 +48,7 @@ df["overall"].mean()  # 4.587589013224822
 
 time_based_weighted_average(df)  # 4.593847825464406
 ```
-There is a minimal difference between **normal mean** and **time-based weighted mean**.
+There is a minimal difference between **normal mean** and **time-based weighted mean**. Although the difference is small, this may affect our study and can be important.
 
 2-) **time_based_weighted_average()** function is;
 ```ruby
