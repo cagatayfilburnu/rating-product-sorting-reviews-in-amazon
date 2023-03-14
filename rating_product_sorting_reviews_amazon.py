@@ -34,7 +34,7 @@ def check_df(dataframe, head=5):
     print("################ Tail ##################")
     print(dataframe.tail(head))
     print("################ NA ##################")
-    if df.isnull().values.any():
+    if dataframe.isnull().values.any():
         print(dataframe.isnull().sum())
     else:
         print("There is no NA")
